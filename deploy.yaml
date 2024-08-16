@@ -1,0 +1,38 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout master branch
+      uses: actions/checkout@v3
+
+    - name: Download audio_files_json_generator.sh
+      run: wget https://raw.githubusercontent.com/audio-bible/scripts/master/audio_files_json_generator.sh
+
+    - name: Make the script executable
+      run: chmod +x audio_files_json_generator.sh
+
+    - name: Execute the script
+      run: ./audio_files_json_generator.sh
+
+    - name: Delete the script
+      run: rm audio_files_json_generator.sh
+
+    - name: Deploy to gh-pages branch
+      uses: peaceiris/actions-gh-pages@v4
+      with:
+        github_token: ${{ secrets.REPO_SECRET }}
+        publish_dir: ./  # The directory to deploy
+        publish_branch: gh-pages  # The branch to deploy to
+        force_orphan: true  # Create a new orphan branch if gh-pages doesn't exist
+        allow_empty_commit: true  # Avoids errors on empty commits
+
+    - name: Confirm Deployment
+      run: echo "Deployment to gh-pages completed."
